@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -97,8 +98,38 @@ public class Main_window extends javax.swing.JFrame {
        ImageIcon image=new ImageIcon(img2);
        return image;
    }
+   public ArrayList<Product> layProductTimKiem() throws SQLException
+   {
+       ArrayList<Product> productList=new ArrayList<Product>();
+       Connection con=layKetNoi();
+       String name=txt_NameS.getText();
+       String sql="select * from products where name LIKE'%"+name+"%'";
+       PreparedStatement ps =con.prepareStatement(sql);
+      // ps.setString(1,name);
+       ResultSet rs;
+       Product product ;
+       try{
+            
+            rs=ps.executeQuery(sql);
+            while(rs.next())
+            {
+                product=new Product(rs.getInt("id"),rs.getString("name"),Float.parseFloat(rs.getString("price")),rs.getString("add_date"),rs.getBytes("image"));
+//               product.setId(rs.getInt("id"));
+//               product.setName(rs.getString("name"));
+//               product.setPrice(Float.parseFloat(rs.getString("price")));
+//               product.setAddDate(rs.getString("add_date"));
+//               product.setPricture(rs.getBytes("images"));
+                productList.add(product);
+            }
+       }catch(Exception ex)
+       {
+           
+       }
+       return productList;
+   }
    
-   // load du lieu vao jTable
+   
+   // load du lieu vao mang ArrayList
    public ArrayList<Product> layProduct() throws SQLException
    {
        ArrayList<Product> productList=new ArrayList<Product>();
@@ -125,6 +156,22 @@ public class Main_window extends javax.swing.JFrame {
            
        }
        return productList;
+   }
+   public void show_product_JTable_TimKiem() throws SQLException
+   {
+       ArrayList<Product> list=layProductTimKiem();
+       DefaultTableModel modle=(DefaultTableModel) JTable_Product.getModel();
+       // clear Jtable
+       modle.setRowCount(0);
+       Object[] row =new Object[4];
+       for(int i=0;i<list.size();i++)
+       {
+           row[0]=list.get(i).getId();
+           row[1]=list.get(i).getName();
+           row[2]=list.get(i).getPrice();
+           row[3]=list.get(i).getAddDate();
+           modle.addRow(row);
+       }
    }
    // show du lieu
    public void show_product_JTable() throws SQLException
@@ -188,6 +235,8 @@ public class Main_window extends javax.swing.JFrame {
         btn_Next = new javax.swing.JButton();
         btn_Previous = new javax.swing.JButton();
         btn_Last = new javax.swing.JButton();
+        btn_TimKiem = new javax.swing.JButton();
+        txt_NameS = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -355,6 +404,13 @@ public class Main_window extends javax.swing.JFrame {
             }
         });
 
+        btn_TimKiem.setText("Tim Kiem");
+        btn_TimKiem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_TimKiemActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -363,9 +419,6 @@ public class Main_window extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(19, 19, 19)
                         .addComponent(btn_Frist)
                         .addGap(26, 26, 26)
@@ -373,7 +426,15 @@ public class Main_window extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(btn_Previous)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_Last))))
+                        .addComponent(btn_Last))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txt_NameS, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(38, 38, 38)
+                                .addComponent(btn_TimKiem, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -381,7 +442,12 @@ public class Main_window extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(13, 13, 13)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btn_TimKiem)
+                            .addComponent(txt_NameS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(28, 28, 28)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(34, 34, 34)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btn_Frist)
@@ -602,6 +668,22 @@ public class Main_window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn_PreviousActionPerformed
 
+    private void btn_TimKiemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_TimKiemActionPerformed
+        // TODO add your handling code here:
+        if(!txt_NameS.getText().equals(""))
+        {
+            try {
+                show_product_JTable_TimKiem();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(rootPane,"Tim Kiem thanh cong");
+            }
+                   
+                
+                        
+                      
+        }
+    }//GEN-LAST:event_btn_TimKiemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -648,6 +730,7 @@ public class Main_window extends javax.swing.JFrame {
     private javax.swing.JButton btn_Last;
     private javax.swing.JButton btn_Next;
     private javax.swing.JButton btn_Previous;
+    private javax.swing.JButton btn_TimKiem;
     private javax.swing.JButton btn_insert;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -659,6 +742,7 @@ public class Main_window extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbImg;
+    private javax.swing.JTextField txt_NameS;
     private com.toedter.calendar.JDateChooser txt_addDate;
     private javax.swing.JTextField txt_id;
     private javax.swing.JTextField txt_name;
